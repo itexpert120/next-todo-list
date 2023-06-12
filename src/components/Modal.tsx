@@ -11,7 +11,7 @@ interface ModalProps {
 export function Modal(props: ModalProps) {
   return (
     <>
-      {props.showModal ? (
+      {props.showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center">
           <div className="mx-4 w-[500px] flex flex-col">
             <div className="bg-white p-2 rounded-lg">
@@ -72,7 +72,7 @@ export function Modal(props: ModalProps) {
             </div>
           </div>
         </div>
-      ) : null}
+      )}
     </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { v4 as uuid } from "uuid";
 import { Article, Modal, CompletedTasks } from "../components/index";
 
 function useTasks(initialTasks: Task[] = []) {
@@ -74,6 +75,7 @@ export default function Home() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const newTask: Task = {
+      id: uuid(),
       title: title,
       summary: summary,
     };
