@@ -1,3 +1,5 @@
 import { Article } from "./Article"
+import { Modal } from "./Modal"
+import { CompletedTasks } from "./CompletedTasks"
 
-export { Article }
+export { Article, Modal, CompletedTasks }
