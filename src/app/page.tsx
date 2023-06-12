@@ -115,7 +115,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="max-w-[550px] mx-auto my-12 dark">
+      <div className="max-w-[550px] mx-auto my-12">
         <div className="m-4">
           <div className="my-4">
             <h1 className="text-4xl font-black">My Tasks</h1>
