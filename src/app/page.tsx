@@ -1,16 +1,75 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Article, Modal, CompletedTasks } from "../components/index";
+
+function useTasks(initialTasks: Task[] = []) {
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+
+  function addTask(newTask: Task) {
+    const updatedTasks: Task[] = [...tasks, newTask];
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  }
+
+  return {
+    tasks,
+    addTask,
+    setTasks,
+  };
+}
+
+function useCompletedTasks(initialCompletedTasks: Task[] = []) {
+  const [completedTasks, setCompletedTasks] = useState<Task[]>(
+    initialCompletedTasks
+  );
+
+  const clearCompleted = () => {
+    setCompletedTasks([]);
+    localStorage.setItem("completedTasks", JSON.stringify([]));
+  };
+
+  return {
+    completedTasks,
+    clearCompleted,
+    setCompletedTasks,
+  };
+}
+
+function TasksList({
+  tasks,
+  onDelete,
+}: {
+  tasks: Task[];
+  onDelete: (index: number) => void;
+}) {
+  if (tasks.length === 0) {
+    return <p className="py-2 text-center text-xl">No Tasks Added</p>;
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {tasks.map((t: Task, i) => (
+        <Article
+          key={i}
+          title={t.title}
+          body={t.summary}
+          onDelete={() => onDelete(i)}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
-
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
+
+  const { tasks, addTask, setTasks } = useTasks([]);
+  const { completedTasks, clearCompleted, setCompletedTasks } =
+    useCompletedTasks([]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,11 +77,7 @@ export default function Home() {
       title: title,
       summary: summary,
     };
-    const newTasks: Task[] = [...tasks, newTask];
-    setTasks(newTasks);
-
-    // Save newTasks to local storage
-    localStorage.setItem("tasks", JSON.stringify(newTasks));
+    addTask(newTask);
 
     // clear values
     setShowModal(false);
@@ -30,23 +85,14 @@ export default function Home() {
     setSummary("");
   }
 
-  const handleDelete = (index: number) => {
-    const updatedList = [...tasks];
-    updatedList.splice(index, 1); // Remove task from updatedList
-
-    const newCompletedTasks = [...completedTasks, tasks[index]]; // Access the task from the original tasks array
-
-    setTasks(updatedList);
+  function deleteTask(index: number) {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(index, 1);
+    const newCompletedTasks = [...completedTasks, tasks[index]];
+    setTasks(updatedTasks);
     setCompletedTasks(newCompletedTasks);
-
-    // Save updated tasks to local storage
-    localStorage.setItem("tasks", JSON.stringify(updatedList));
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
     localStorage.setItem("completedTasks", JSON.stringify(newCompletedTasks));
-  };
-
-  function clearCompleted() {
-    setCompletedTasks([]);
-    localStorage.setItem("completedTasks", JSON.stringify([]));
   }
 
   useEffect(() => {
@@ -63,7 +109,7 @@ export default function Home() {
       const parsedCompletedTasks: Task[] = JSON.parse(savedCompletedTasks);
       setCompletedTasks(parsedCompletedTasks);
     }
-  }, []);
+  }, [setCompletedTasks, setTasks]);
 
   return (
     <>
@@ -72,20 +118,9 @@ export default function Home() {
           <div className="my-4">
             <h1 className="text-4xl font-black">My Tasks</h1>
           </div>
-          <div className="flex flex-col gap-2">
-            {tasks.length !== 0 ? (
-              tasks.map((t: Task, i) => (
-                <Article
-                  key={i}
-                  title={t.title}
-                  body={t.summary}
-                  onDelete={() => handleDelete(i)}
-                />
-              ))
-            ) : (
-              <p className="py-2 text-center text-xl">No Tasks Added</p>
-            )}
-          </div>
+
+          <TasksList tasks={tasks} onDelete={deleteTask} />
+
           <button
             type="button"
             className="text-white text-sm bg-sky-500 hover:bg-sky-600 rounded-lg w-full py-2 my-4"
