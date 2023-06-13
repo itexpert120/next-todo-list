@@ -11,15 +11,13 @@ export function CompletedTasks(props: CompletedTasksProps) {
   }
 
   return (
-    <div className="my-4 flex flex-col gap-2">
+    <div className="my-2 flex flex-col gap-2 shadow-sm">
       {completedTasks.length !== 0 && (
-        <div className="my-4">
-          <h1 className="text-2xl font-bold">Completed Tasks</h1>
-        </div>
+        <h1 className="mt-4 text-2xl font-bold">Completed Tasks</h1>
       )}
       <button
         type="button"
-        className="text-white text-sm bg-sky-500 hover:bg-sky-600 rounded-lg w-full py-2"
+        className="my-2 text-white text-sm bg-sky-500 hover:bg-sky-600 rounded-lg w-full py-2"
         onClick={clearCompleted}
       >
         Clear Completed
@@ -33,7 +31,17 @@ export function CompletedTasks(props: CompletedTasksProps) {
           <div className="flex flex-row justify-between">
             <h1 className="font-bold text-lg">{task.title}</h1>
           </div>
-          <p className="text-black my-1">{task.summary}</p>
+
+          {/* <p className="text-black my-1">{task.summary}</p> */}
+          <div className="flex flex-row justify-between items-center mt-2">
+            <p className="my-1">{task.summary}</p>
+            <p className="font-bold text-sm my-1">
+              Completed:{" "}
+              <span className="font-normal text-gray-500">
+                {task.timeCompleted}
+              </span>
+            </p>
+          </div>
         </div>
       ))}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { v4 as uuid } from "uuid";
 import { Article, Modal, CompletedTasks } from "../components/index";
 
@@ -45,7 +46,7 @@ function TasksList({
   onDelete: (index: number) => void;
 }) {
   if (tasks.length === 0) {
-    return <p className="py-2 text-center text-xl">No Tasks Added</p>;
+    return <p className="mb-2 text-gray-600 text-md">No Tasks Added</p>;
   }
 
   return (
@@ -56,6 +57,7 @@ function TasksList({
           title={t.title}
           body={t.summary}
           onDelete={() => onDelete(i)}
+          timeAdded={t.timeAdded}
         />
       ))}
     </div>
@@ -72,12 +74,28 @@ export default function Home() {
   const { completedTasks, clearCompleted, setCompletedTasks } =
     useCompletedTasks([]);
 
+  function getTime() {
+    const today = new Date();
+    const date =
+      today.getDate() +
+      "/" +
+      (today.getMonth() + 1) +
+      "/" +
+      today.getFullYear();
+    const time = today.getHours() + ":" + today.getMinutes();
+    const dateTime = time + " " + date;
+
+    return dateTime;
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const newTask: Task = {
       id: uuid(),
       title: title,
       summary: summary,
+      timeAdded: getTime(),
+      timeCompleted: "",
     };
     addTask(newTask);
 
@@ -88,6 +106,8 @@ export default function Home() {
   }
 
   function deleteTask(index: number) {
+    tasks[index].timeCompleted = getTime();
+
     const updatedTasks = [...tasks];
     updatedTasks.splice(index, 1);
     const newCompletedTasks = [...completedTasks, tasks[index]];
@@ -117,15 +137,13 @@ export default function Home() {
     <>
       <div className="max-w-[550px] mx-auto my-12">
         <div className="m-4">
-          <div className="my-4">
-            <h1 className="text-4xl font-black">My Tasks</h1>
-          </div>
+          <h1 className="mb-4 text-4xl font-black">My Tasks</h1>
 
           <TasksList tasks={tasks} onDelete={deleteTask} />
 
           <button
             type="button"
-            className="text-white text-sm bg-sky-500 hover:bg-sky-600 rounded-lg w-full py-2 my-4"
+            className="text-white text-sm bg-sky-500 hover:bg-sky-600 rounded-lg w-full py-2 my-2"
             onClick={() => setShowModal(true)}
           >
             New Task
